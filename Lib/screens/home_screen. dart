@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:solo_leveling/models/player.dart';
-import 'package:solo_leveling/screens/quest_screen.dart';
-import 'package:solo_leveling/screens/stats_screen.dart';
-import 'package:solo_leveling/screens/boss_battle_screen.dart';
+import '../models/player.dart';
+import 'quest_screen.dart';
+import 'stat_allocation_screen.dart';
+import 'shadow_extraction_screen.dart';
+import 'boss_gate_screen.dart';
+import 'inventory_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final Player player;
@@ -14,56 +16,80 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(
-          'Welcome, ${player.name}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
+        title: Text('Welcome, ${player.name}'),
+        backgroundColor: Colors.deepPurple.shade900,
+        foregroundColor: Colors.white,
         centerTitle: true,
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Level: ${player.level}',
-              style: const TextStyle(fontSize: 24, color: Colors.white),
+              'Level: ${player.level} | XP: ${player.xp}/${player.xpToNextLevel}',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuestScreen(player: player),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => QuestScreen(player: player),
+                ));
               },
-              child: const Text('Quests'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text('Start Quest'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StatsScreen(player: player),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => StatAllocationScreen(player: player),
+                ));
               },
-              child: const Text('Distribute Stat Points'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text('Allocate Stats'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BossBattleScreen(player: player),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => ShadowExtractionScreen(player: player),
+                ));
               },
-              child: const Text('Boss Battles'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text('Shadow Extraction'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => BossGateScreen(player: player),
+                ));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+              ),
+              child: const Text('Enter Boss Gate'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => InventoryScreen(player: player),
+                ));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
+              child: const Text('Open Inventory'),
             ),
           ],
         ),
