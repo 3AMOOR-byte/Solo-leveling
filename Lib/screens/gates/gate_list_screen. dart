@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'gate_detail_screen.dart';
+
+class Gate {
+  final String name;
+  final String rank;
+  final bool isBossGate;
+
+  Gate({
+    required this.name,
+    required this.rank,
+    required this.isBossGate,
+  });
+}
+
+class GateListScreen extends StatelessWidget {
+  final List<Gate> gates = [
+    Gate(name: 'E-Rank Gate', rank: 'E', isBossGate: false),
+    Gate(name: 'D-Rank Gate', rank: 'D', isBossGate: false),
+    Gate(name: 'C-Rank Gate', rank: 'C', isBossGate: false),
+    Gate(name: 'B-Rank Gate', rank: 'B', isBossGate: false),
+    Gate(name: 'A-Rank Gate', rank: 'A', isBossGate: false),
+    Gate(name: 'S-Rank Gate', rank: 'S', isBossGate: true),
+    Gate(name: 'Red Gate (Igris)', rank: 'S', isBossGate: true),
+    Gate(name: 'Shadow Monarch Gate', rank: 'SS', isBossGate: true),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Gates'),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.grey[900],
+      body: ListView.builder(
+        itemCount: gates.length,
+        itemBuilder: (context, index) {
+          final gate = gates[index];
+          return Card(
+            color: gate.isBossGate ? Colors.red[900] : Colors.blueGrey[800],
+            child: ListTile(
+              title: Text(
+                gate.name,
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                '${gate.rank}-Rank ${gate.isBossGate ? "(Boss)" : ""}',
+                style: TextStyle(color: Colors.grey[300]),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => GateDetailScreen(gate: gate),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
