@@ -4,76 +4,85 @@ import '../models/player.dart';
 class StatsScreen extends StatefulWidget {
   final Player player;
 
-  StatsScreen({required this.player});
+  const StatsScreen({super.key, required this.player});
 
   @override
-  _StatsScreenState createState() => _StatsScreenState();
+  State<StatsScreen> createState() => _StatsScreenState();
 }
 
 class _StatsScreenState extends State<StatsScreen> {
-  void increaseStat(String stat) {
-    if (widget.player.statPoints <= 0) return;
+  void allocate(String stat) {
+    if (widget.player.statPoints > 0) {
+      setState(() {
+        widget.player.statPoints--;
 
-    setState(() {
-      switch (stat) {
-        case 'strength':
-          widget.player.strength++;
-          break;
-        case 'intelligence':
-          widget.player.intelligence++;
-          break;
-        case 'stamina':
-          widget.player.stamina++;
-          break;
-        case 'mana':
-          widget.player.mana++;
-          break;
-        case 'sense':
-          widget.player.sense++;
-          break;
-      }
-      widget.player.statPoints--;
-    });
+        switch (stat) {
+          case 'Strength':
+            widget.player.strength++;
+            break;
+          case 'Intelligence':
+            widget.player.intelligence++;
+            break;
+          case 'Stamina':
+            widget.player.stamina++;
+            break;
+          case 'Energy':
+            widget.player.energy++;
+            break;
+          case 'Sense':
+            widget.player.sense++;
+            break;
+        }
+      });
+    }
   }
 
-  Widget buildStatRow(String label, int value, String key) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$label: $value', style: TextStyle(fontSize: 18, color: Colors.white)),
-        IconButton(
-          icon: Icon(Icons.add_circle, color: Colors.deepPurpleAccent),
-          onPressed: () => increaseStat(key),
+  Widget buildStat(String label, int value) {
+    return Card(
+      color: Colors.blueGrey[800],
+      child: ListTile(
+        title: Text(
+          "$label: $value",
+          style: const TextStyle(color: Colors.white),
         ),
-      ],
+        trailing: widget.player.statPoints > 0
+            ? IconButton(
+                icon: const Icon(Icons.add, color: Colors.greenAccent),
+                onPressed: () => allocate(label),
+              )
+            : null,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final player = widget.player;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Player Stats', style: TextStyle(color: Colors.white)),
+        title: const Text("Distribute Stat Points"),
         backgroundColor: Colors.black,
       ),
-      backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            Text('Level: ${player.level}', style: TextStyle(fontSize: 20, color: Colors.amber)),
-            SizedBox(height: 10),
-            Text('Available Points: ${player.statPoints}', style: TextStyle(fontSize: 16, color: Colors.white)),
-            Divider(color: Colors.white24),
-            buildStatRow('Strength', player.strength, 'strength'),
-            buildStatRow('Intelligence', player.intelligence, 'intelligence'),
-            buildStatRow('Stamina', player.stamina, 'stamina'),
-            buildStatRow('Mana', player.mana, 'mana'),
-            buildStatRow('Sense', player.sense, 'sense'),
-          ],
-        ),
+      backgroundColor: Colors.grey[900],
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            "Available Points: ${widget.player.statPoints}",
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView(
+              children: [
+                buildStat("Strength", widget.player.strength),
+                buildStat("Intelligence", widget.player.intelligence),
+                buildStat("Stamina", widget.player.stamina),
+                buildStat("Energy", widget.player.energy),
+                buildStat("Sense", widget.player.sense),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
