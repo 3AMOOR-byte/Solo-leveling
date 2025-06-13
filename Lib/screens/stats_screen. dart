@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class StatsScreen extends StatefulWidget {
+  final Player player;
+
+  StatsScreen({required this.player});
+
+  @override
+  _StatsScreenState createState() => _StatsScreenState();
+}
+
+class _StatsScreenState extends State<StatsScreen> {
+  void increaseStat(String stat) {
+    if (widget.player.statPoints <= 0) return;
+
+    setState(() {
+      switch (stat) {
+        case 'strength':
+          widget.player.strength++;
+          break;
+        case 'intelligence':
+          widget.player.intelligence++;
+          break;
+        case 'stamina':
+          widget.player.stamina++;
+          break;
+        case 'mana':
+          widget.player.mana++;
+          break;
+        case 'sense':
+          widget.player.sense++;
+          break;
+      }
+      widget.player.statPoints--;
+    });
+  }
+
+  Widget buildStatRow(String label, int value, String key) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('$label: $value', style: TextStyle(fontSize: 18, color: Colors.white)),
+        IconButton(
+          icon: Icon(Icons.add_circle, color: Colors.deepPurpleAccent),
+          onPressed: () => increaseStat(key),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final player = widget.player;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Player Stats', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            Text('Level: ${player.level}', style: TextStyle(fontSize: 20, color: Colors.amber)),
+            SizedBox(height: 10),
+            Text('Available Points: ${player.statPoints}', style: TextStyle(fontSize: 16, color: Colors.white)),
+            Divider(color: Colors.white24),
+            buildStatRow('Strength', player.strength, 'strength'),
+            buildStatRow('Intelligence', player.intelligence, 'intelligence'),
+            buildStatRow('Stamina', player.stamina, 'stamina'),
+            buildStatRow('Mana', player.mana, 'mana'),
+            buildStatRow('Sense', player.sense, 'sense'),
+          ],
+        ),
+      ),
+    );
+  }
+}
