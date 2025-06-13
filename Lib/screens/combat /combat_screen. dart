@@ -1,0 +1,120 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:solo_leveling/models/player.dart';
+import 'package:solo_leveling/screens/gates/gate_list_screen.dart';
+
+class CombatScreen extends StatefulWidget {
+  final Gate gate;
+
+  CombatScreen({required this.gate});
+
+  @override
+  _CombatScreenState createState() => _CombatScreenState();
+}
+
+class _CombatScreenState extends State<CombatScreen> {
+  int enemyHp = 100;
+  int playerDamage = player.strength * 5;
+  bool defeated = false;
+  bool bossDefeated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    enemyHp = widget.gate.isBossGate
+        ? 200 + (widget.gate.requiredLevel * 10)
+        : 100 + (widget.gate.requiredLevel * 5);
+  }
+
+  void attack() {
+    setState(() {
+      enemyHp -= playerDamage;
+      if (enemyHp <= 0) {
+        defeated = true;
+        player.experience += widget.gate.isBossGate ? 100 : 50;
+
+        // Level up if XP exceeds threshold
+        while (player.experience >= player.level * 100) {
+          player.experience -= player.level * 100;
+          player.level++;
+          player.statPoints++;
+        }
+
+        if (widget.gate.isBossGate) bossDefeated = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[900],
+      appBar: AppBar(
+        title: Text('Gate Combat'),
+        backgroundColor: Colors.black,
+      ),
+      body: defeated
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 64),
+                  Text(
+                    bossDefeated ? 'Boss Defeated!' : 'Monsters Cleared!',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'XP Gained: ${widget.gate.isBossGate ? 100 : 50}',
+                    style: TextStyle(color: Colors.grey[300]),
+                  ),
+                  Text(
+                    'Current Level: ${player.level}',
+                    style: TextStyle(color: Colors.grey[300]),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Return'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                    ),
+                  )
+                ],
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Text(
+                    widget.gate.isBossGate ? 'Boss Fight!' : 'Gate Monsters',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Enemy HP: $enemyHp',
+                    style: TextStyle(color: Colors.redAccent, fontSize: 20),
+                  ),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: attack,
+                    child: Text('Attack!'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepOrange,
+                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                      textStyle: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Your Damage: $playerDamage',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+}
