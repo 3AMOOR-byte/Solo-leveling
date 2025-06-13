@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class ShadowExtractionScreen extends StatefulWidget {
+  final Player player;
+
+  const ShadowExtractionScreen({super.key, required this.player});
+
+  @override
+  State<ShadowExtractionScreen> createState() => _ShadowExtractionScreenState();
+}
+
+class _ShadowExtractionScreenState extends State<ShadowExtractionScreen> {
+  List<String> defeatedMonsters = ['Goblin', 'Ice Orc', 'Iron', 'Igris'];
+  List<String> extractedShadows = [];
+  String? lastResult;
+
+  void _extractShadow(String monster) {
+    double chance = (widget.player.intelligence * 2) / 100; // مثال: 30 ذكاء = 60% نسبة نجاح
+    bool success = (chance >= (0.5 + extractedShadows.length * 0.1)) || widget.player.intelligence > 50;
+
+    setState(() {
+      if (success) {
+        extractedShadows.add(monster);
+        lastResult = '$monster shadow extracted!';
+      } else {
+        lastResult = 'Extraction failed!';
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.player.level < 20) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text('Shadow Extraction', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.deepPurple[900],
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: const Center(
+          child: Text(
+            'Unlocks at Level 20!',
+            style: TextStyle(color: Colors.white70, fontSize: 22),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Shadow Extraction', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple[900],
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          const Text(
+            'Defeated Monsters:',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          ...defeatedMonsters.map((monster) {
+            return ListTile(
+              title: Text(monster, style: const TextStyle(color: Colors.white)),
+              trailing: ElevatedButton(
+                onPressed: extractedShadows.contains(monster)
+                    ? null
+                    : () => _extractShadow(monster),
+                child: const Text('Extract'),
+              ),
+            );
+          }).toList(),
+          const Divider(color: Colors.deepPurple),
+          const Text('Extracted Shadows:', style: TextStyle(color: Colors.white70, fontSize: 18)),
+          ...extractedShadows.map((shadow) => ListTile(
+                title: Text('$shadow (Shadow)', style: const TextStyle(color: Colors.deepPurpleAccent)),
+              )),
+          if (lastResult != null) ...[
+            const SizedBox(height: 10),
+            Text(lastResult!, style: const TextStyle(color: Colors.white)),
+          ],
+        ],
+      ),
+    );
+  }
+}
