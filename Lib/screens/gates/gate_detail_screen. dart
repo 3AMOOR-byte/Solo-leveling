@@ -1,0 +1,57 @@
+import 'package:flutter/material.dart';
+import 'package:solo_leveling/screens/gates/gate_list_screen.dart';
+import 'package:solo_leveling/screens/combat/combat_screen.dart';
+
+class GateDetailScreen extends StatelessWidget {
+  final Gate gate;
+
+  GateDetailScreen({required this.gate});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(gate.name),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.grey[900],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              '${gate.rank}-Rank Gate',
+              style: TextStyle(fontSize: 24, color: Colors.white),
+            ),
+            SizedBox(height: 20),
+            Text(
+              gate.isBossGate
+                  ? 'This gate contains a powerful boss enemy.'
+                  : 'This gate contains regular monsters.',
+              style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+              textAlign: TextAlign.center,
+            ),
+            Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CombatScreen(
+                      gate: gate,
+                    ),
+                  ),
+                );
+              },
+              child: Text('Enter Gate'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
