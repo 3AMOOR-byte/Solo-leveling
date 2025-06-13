@@ -1,0 +1,17 @@
+class Item {
+  final String name;
+  final String type; // 'weapon', 'potion', 'armor', ...
+  final String description;
+  final int power; // تأثير العنصر (مثلاً زيادة ضرر أو علاج)
+  final String rarity;
+  final String effect; // 'damage_boost', 'heal', 'mana_restore', 'none'
+
+  Item({
+    required this.name,
+    required this.type,
+    required this.description,
+    required this.power,
+    required this.rarity,
+    required this.effect,
+  });
+}
