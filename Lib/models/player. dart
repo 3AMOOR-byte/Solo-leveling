@@ -1,96 +1,41 @@
+import 'item.dart';
+
 class Player {
   String name;
-  String avatarPath;
   int level;
-  int currentXP;
-  int xpToNextLevel;
-  int availablePoints;
-
+  int hp;
+  int maxHp;
   int strength;
-  int intelligence;
-  int vitality;
-  int energy;
-  int sense;
+  List<Item> inventory;
 
-  List<String> quests;
-  List<String> completedQuests;
-  List<String> defeatedMonsters;
-  List<String> shadows;
+  // Singleton player example
+  static final Player instance = Player._internal();
 
-  Player({
-    this.name = '',
-    this.avatarPath = '',
-    this.level = 1,
-    this.currentXP = 0,
-    this.xpToNextLevel = 100,
-    this.availablePoints = 0,
-    this.strength = 0,
-    this.intelligence = 0,
-    this.vitality = 0,
-    this.energy = 0,
-    this.sense = 0,
-    List<String>? quests,
-    List<String>? completedQuests,
-    List<String>? defeatedMonsters,
-    List<String>? shadows,
-  })  : quests = quests ?? [],
-        completedQuests = completedQuests ?? [],
-        defeatedMonsters = defeatedMonsters ?? [],
-        shadows = shadows ?? [];
+  Player._internal()
+      : name = 'Player',
+        level = 1,
+        hp = 100,
+        maxHp = 100,
+        strength = 10,
+        inventory = [];
 
-  void gainXP(int amount) {
-    currentXP += amount;
-    while (currentXP >= xpToNextLevel) {
-      levelUp();
-    }
+  void heal(int amount) {
+    hp += amount;
+    if (hp > maxHp) hp = maxHp;
   }
 
-  void levelUp() {
-    currentXP -= xpToNextLevel;
-    level += 1;
-    availablePoints += 1;
-
-    // زيادة XP المطلوبة للمستوى التالي
-    xpToNextLevel += 50;
-  }
-
-  void assignPoint(String stat) {
-    if (availablePoints <= 0) return;
-
-    switch (stat) {
-      case 'Strength':
-        strength += 1;
+  void useItem(Item item) {
+    switch (item.effect) {
+      case 'heal':
+        heal(item.power);
         break;
-      case 'Intelligence':
-        intelligence += 1;
+      case 'damage_boost':
+        // Implement damage boost effect here if needed
         break;
-      case 'Vitality':
-        vitality += 1;
-        break;
-      case 'Energy':
-        energy += 1;
-        break;
-      case 'Sense':
-        sense += 1;
+      // Add other effects if needed
+      default:
         break;
     }
-    availablePoints -= 1;
-  }
-
-  void completeQuest(String quest) {
-    if (quests.contains(quest) && !completedQuests.contains(quest)) {
-      completedQuests.add(quest);
-      gainXP(50); // أو أي قيمة XP مناسبة
-    }
-  }
-
-  void defeatMonster(String monsterName) {
-    if (!defeatedMonsters.contains(monsterName)) {
-      defeatedMonsters.add(monsterName);
-    }
-  }
-
-  bool canExtractShadows() {
-    return level >= 20;
+    inventory.remove(item);
   }
 }
