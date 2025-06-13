@@ -1,130 +1,28 @@
-import 'package:flutter/material.dart';
-import '../models/player.dart';
+import 'package:flutter/material.dart'; import 'boss_battle_screen.dart';
 
-class GateScreen extends StatefulWidget {
-  final Player player;
+class Gate { final String name; final int requiredLevel; final String rank;
 
-  GateScreen({required this.player});
+Gate({ required this.name, required this.requiredLevel, required this.rank, }); }
 
-  @override
-  _GateScreenState createState() => _GateScreenState();
+class GatesScreen extends StatelessWidget { final int playerLevel; final int playerStrength;
+
+GatesScreen({ required this.playerLevel, required this.playerStrength, });
+
+final List<Gate> gates = [ Gate(name: "Gate A - Weak Dungeon", requiredLevel: 5, rank: "E"), Gate(name: "Gate B - Orc Camp", requiredLevel: 15, rank: "D"), Gate(name: "Gate C - Igris Castle", requiredLevel: 25, rank: "C"), Gate(name: "Gate D - Baruka's Hideout", requiredLevel: 35, rank: "B"), Gate(name: "Gate E - Kamish's Lair", requiredLevel: 50, rank: "A"), ];
+
+void enterGate(BuildContext context, Gate gate) { if (playerLevel < gate.requiredLevel) { ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("مستواك مش كافي لدخول البوابة: ${gate.name}")), ); return; }
+
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => BossBattleScreen(
+      playerLevel: playerLevel,
+      playerStrength: playerStrength,
+    ),
+  ),
+);
+
 }
 
-class _GateScreenState extends State<GateScreen> {
-  String selectedGate = '';
-  String task = '';
-  int xpEarned = 0;
-  bool bossDefeated = false;
-  bool showResult = false;
+@override Widget build(BuildContext context) { return Scaffold( appBar: AppBar(title: Text("Gates")), body: ListView.builder( itemCount: gates.length, itemBuilder: (context, index) { final gate = gates[index]; return Card( margin: EdgeInsets.all(8), child: ListTile( title: Text(gate.name), subtitle: Text("Rank: ${gate.rank} | Requires LVL ${gate.requiredLevel}"), trailing: ElevatedButton( onPressed: () => enterGate(context, gate), child: Text("Enter"), ), ), ); }, ), ); } }
 
-  final gates = {
-    'Weak Gate': {
-      'task': 'اعمل 15 تمرين ضغط',
-      'xp': 100,
-      'boss': 'Goblin King',
-    },
-    'Intermediate Gate': {
-      'task': 'اجري في المكان 30 ثانية',
-      'xp': 200,
-      'boss': 'Orc Leader',
-    },
-    'Igris Gate': {
-      'task': 'اعمل 30 تمرين سكوات',
-      'xp': 300,
-      'boss': 'Igris',
-    },
-  };
-
-  void selectGate(String gateName) {
-    setState(() {
-      selectedGate = gateName;
-      task = gates[gateName]!['task']!;
-      xpEarned = gates[gateName]!['xp']!;
-      bossDefeated = false;
-      showResult = false;
-    });
-  }
-
-  void completeGate() {
-    setState(() {
-      widget.player.xp += xpEarned;
-      bossDefeated = true;
-      showResult = true;
-
-      if (widget.player.xp >= widget.player.level * 100) {
-        widget.player.level++;
-        widget.player.xp = 0;
-        widget.player.points += 1;
-      }
-    });
-  }
-
-  String getLootBox() {
-    final items = ['XP Boost', 'Potion', 'Skill Scroll', 'Epic Sword'];
-    items.shuffle();
-    return items.first;
-  }
-
-  bool canExtractShadow() {
-    return widget.player.level >= 20 && widget.player.intelligence >= 10;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text('Gates', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.deepPurple[800],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text('اختر بوابة:', style: TextStyle(color: Colors.white, fontSize: 20)),
-            SizedBox(height: 10),
-            ...gates.keys.map((gate) {
-              return ElevatedButton(
-                onPressed: () => selectGate(gate),
-                child: Text(gate),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
-              );
-            }).toList(),
-            SizedBox(height: 20),
-            if (selectedGate.isNotEmpty)
-              Column(
-                children: [
-                  Text('المهمة: $task', style: TextStyle(color: Colors.white70)),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: completeGate,
-                    child: Text('أنهيت المهمة'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green[700]),
-                  ),
-                ],
-              ),
-            if (showResult)
-              Column(
-                children: [
-                  SizedBox(height: 20),
-                  Text('حصلت على $xpEarned XP!', style: TextStyle(color: Colors.amber)),
-                  if (bossDefeated)
-                    Column(
-                      children: [
-                        Text('هزمت الزعيم: ${gates[selectedGate]!['boss']}!',
-                            style: TextStyle(color: Colors.redAccent)),
-                        Text('Loot Box: ${getLootBox()}',
-                            style: TextStyle(color: Colors.greenAccent)),
-                        if (canExtractShadow())
-                          Text('تم استخراج ظل ${gates[selectedGate]!['boss']}!',
-                              style: TextStyle(color: Colors.cyanAccent)),
-                      ],
-                    ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
