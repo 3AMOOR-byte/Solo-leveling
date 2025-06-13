@@ -1,41 +1,147 @@
-import 'item.dart';
+class Item {
+  final String id;
+  final String name;
+  final String description;
+  final int damage; // ضرر السلاح لو موجود
+  final bool isUsable; // هل يمكن استخدامه في القتال (مثلاً جرعة شفاء)
+  
+  Item({
+    required this.id,
+    required this.name,
+    this.description = '',
+    this.damage = 0,
+    this.isUsable = false,
+  });
+}
 
 class Player {
   String name;
+  String avatar; 
   int level;
-  int hp;
-  int maxHp;
+  int xp;
+  int xpToNextLevel;
+
+  // القدرات
   int strength;
-  List<Item> inventory;
+  int intelligence;
+  int stamina;
+  int energy;
+  int sense;
 
-  // Singleton player example
-  static final Player instance = Player._internal();
+  int skillPoints;
 
-  Player._internal()
-      : name = 'Player',
-        level = 1,
-        hp = 100,
-        maxHp = 100,
-        strength = 10,
-        inventory = [];
+  bool shadowExtractionUnlocked = false;
 
-  void heal(int amount) {
-    hp += amount;
-    if (hp > maxHp) hp = maxHp;
+  // الـ Inventory
+  List<Item> inventory = [];
+
+  Player({
+    required this.name,
+    this.avatar = '',
+    this.level = 1,
+    this.xp = 0,
+    this.xpToNextLevel = 100,
+    this.strength = 0,
+    this.intelligence = 0,
+    this.stamina = 0,
+    this.energy = 0,
+    this.sense = 0,
+    this.skillPoints = 0,
+  });
+
+  void addXp(int amount) {
+    xp += amount;
+    while (xp >= xpToNextLevel) {
+      xp -= xpToNextLevel;
+      levelUp();
+    }
   }
 
-  void useItem(Item item) {
-    switch (item.effect) {
-      case 'heal':
-        heal(item.power);
-        break;
-      case 'damage_boost':
-        // Implement damage boost effect here if needed
-        break;
-      // Add other effects if needed
-      default:
-        break;
+  void levelUp() {
+    level++;
+    skillPoints++;
+    xpToNextLevel = (xpToNextLevel * 1.5).toInt();
+    checkShadowExtractionUnlock();
+  }
+
+  void checkShadowExtractionUnlock() {
+    if (level >= 20 && !shadowExtractionUnlocked) {
+      shadowExtractionUnlocked = true;
+      print('Skill Unlocked: Shadow Extraction');
     }
-    inventory.remove(item);
+  }
+
+  bool allocateSkillPoint(String stat) {
+    if (skillPoints <= 0) return false;
+
+    switch (stat.toLowerCase()) {
+      case 'strength':
+        strength++;
+        break;
+      case 'intelligence':
+        intelligence++;
+        break;
+      case 'stamina':
+        stamina++;
+        break;
+      case 'energy':
+        energy++;
+        break;
+      case 'sense':
+        sense++;
+        break;
+      default:
+        return false;
+    }
+    skillPoints--;
+    return true;
+  }
+
+  String extractShadow(String monsterName) {
+    if (!shadowExtractionUnlocked) {
+      return 'You have not unlocked Shadow Extraction skill yet.';
+    }
+    int shadowPower = intelligence * 10;
+    return 'Extracted shadow of $monsterName with power $shadowPower';
+  }
+
+  // Inventory functions
+  void addItem(Item item) {
+    inventory.add(item);
+  }
+
+  bool removeItem(String itemId) {
+    final itemIndex = inventory.indexWhere((item) => item.id == itemId);
+    if (itemIndex == -1) return false;
+    inventory.removeAt(itemIndex);
+    return true;
+  }
+
+  // استخدم عنصر أثناء القتال مثلاً (السلاح يزيد ضرر، جرعة تشفي، الخ)
+  String useItem(String itemId) {
+    final itemIndex = inventory.indexWhere((item) => item.id == itemId);
+    if (itemIndex == -1) return 'Item not found in inventory';
+
+    final item = inventory[itemIndex];
+    if (!item.isUsable) return '${item.name} cannot be used now';
+
+    // مثلاً، لو السلاح: نقدر نطبق ضرر إضافي في القتال عن طريق استدعاء هذه القيمة
+    // أو لو جرعة شفاء، نرجع رسالة تفيد بالشفاء وهكذا
+    // هنا مجرد مثال:
+    inventory.removeAt(itemIndex);
+    return '${item.name} used successfully!';
+  }
+
+  // ضرر اللاعب في القتال يحسب من القوة + ضرر السلاح المستخدم (لو فيه)
+  int calculateDamage({String? weaponId}) {
+    int baseDamage = strength * 5; // مثال، كل نقطة قوة تعطي 5 ضرر
+    if (weaponId != null) {
+      final weapon = inventory.firstWhere(
+        (item) => item.id == weaponId && item.damage > 0,
+        orElse: () => Item(id: '', name: '', damage: 0),
+      );
+      baseDamage += weapon.damage;
+    }
+    return baseDamage;
   }
 }
