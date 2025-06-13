@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+import '../models/item.dart';
+import '../models/player.dart';
+import 'inventory_screen.dart';
+
+class BattleScreen extends StatefulWidget {
+  final int enemyHp;
+  final String enemyName;
+
+  BattleScreen({required this.enemyHp, required this.enemyName});
+
+  @override
+  _BattleScreenState createState() => _BattleScreenState();
+}
+
+class _BattleScreenState extends State<BattleScreen> {
+  int playerHp = Player.instance.hp;
+  int enemyHp = 0;
+  bool damageBoostActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    enemyHp = widget.enemyHp;
+  }
+
+  void applyDamageToEnemy() {
+    int damage = Player.instance.strength;
+    if (damageBoostActive) {
+      damage = (damage * 1.5).toInt(); // 50% more damage
+      damageBoostActive = false; // one-time effect
+    }
+    setState(() {
+      enemyHp -= damage;
+      if (enemyHp < 0) enemyHp = 0;
+    });
+  }
+
+  void useItem(Item item) {
+    if (item.effect == "heal") {
+      setState(() {
+        Player.instance.useItem(item);
+        playerHp = Player.instance.hp;
+      });
+    } else if (item.effect == "damage_boost") {
+      setState(() {
+        damageBoostActive = true;
+        Player.instance.useItem(item);
+      });
+    }
+  }
+
+  void openInventory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => InventoryScreen(
+          onUseItem: useItem,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Battle with ${widget.enemyName}"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text("Player HP: $playerHp"),
+            Text("Enemy HP: $enemyHp"),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                applyDamageToEnemy();
+              },
+              child: Text("Attack"),
+            ),
+            ElevatedButton(
+              onPressed: openInventory,
+              child: Text("Use Item"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
