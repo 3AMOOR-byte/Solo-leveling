@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+import '../models/quest.dart';
+
+class QuestScreen extends StatefulWidget {
+  final Player player;
+  final List<Quest> quests;
+
+  const QuestScreen({super.key, required this.player, required this.quests});
+
+  @override
+  State<QuestScreen> createState() => _QuestScreenState();
+}
+
+class _QuestScreenState extends State<QuestScreen> {
+  void completeQuest(Quest quest) {
+    if (!quest.isCompleted) {
+      setState(() {
+        quest.complete();
+        widget.player.gainXP(quest.rewardXP);
+
+        // لو وحش زعيم
+        if (quest.isBossGate && widget.player.shadowExtractionUnlocked) {
+          widget.player.addShadow(quest.monsterName ?? "Unnamed Shadow");
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Quests & Gates'),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.grey[900],
+      body: ListView.builder(
+        itemCount: widget.quests.length,
+        itemBuilder: (context, index) {
+          final quest = widget.quests[index];
+          return Card(
+            color: quest.isCompleted ? Colors.green[800] : Colors.blueGrey[800],
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              title: Text(
+                quest.title,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                quest.description,
+                style: const TextStyle(color: Colors.white70),
+              ),
+              trailing: quest.isCompleted
+                  ? const Icon(Icons.check_circle, color: Colors.greenAccent)
+                  : ElevatedButton(
+                      onPressed: () => completeQuest(quest),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                      child: const Text('Complete'),
+                    ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
