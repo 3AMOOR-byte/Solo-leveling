@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
-import 'screens/main_screen.dart';
+import 'models/player.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(SoloLevelingApp());
+  runApp(MyApp());
 }
 
-class SoloLevelingApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  final Player player = Player(name: "Unknown");
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Solo Leveling',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        primaryColor: Colors.deepPurple,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-        ),
-      ),
-      home: MainScreen(),
+      theme: ThemeData.dark(),
+      home: HomeScreen(player: player),
     );
   }
 }
