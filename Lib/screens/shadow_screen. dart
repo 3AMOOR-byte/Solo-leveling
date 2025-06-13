@@ -1,0 +1,71 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class ShadowScreen extends StatelessWidget {
+  final Player player;
+
+  const ShadowScreen({super.key, required this.player});
+
+  @override
+  Widget build(BuildContext context) {
+    if (player.level < 20) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text("Shadow Extraction"),
+          backgroundColor: Colors.black,
+        ),
+        body: const Center(
+          child: Text(
+            "🔒 Reach Level 20 to unlock Shadow Extraction",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text("Your Shadows"),
+        backgroundColor: Colors.black,
+      ),
+      body: ListView.builder(
+        itemCount: player.defeatedMonsters.length,
+        itemBuilder: (context, index) {
+          final monster = player.defeatedMonsters[index];
+          final isSummoned = player.shadows.contains(monster);
+
+          return Card(
+            color: Colors.grey[850],
+            child: ListTile(
+              title: Text(
+                monster,
+                style: const TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                isSummoned ? "✅ Shadow Summoned" : "Tap to Extract",
+                style: TextStyle(
+                  color: isSummoned ? Colors.green : Colors.blueAccent,
+                ),
+              ),
+              trailing: !isSummoned
+                  ? IconButton(
+                      icon: const Icon(Icons.add_circle, color: Colors.blue),
+                      onPressed: () {
+                        player.shadows.add(monster);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("You extracted shadow of $monster!"),
+                          backgroundColor: Colors.black,
+                        ));
+                      },
+                    )
+                  : null,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
