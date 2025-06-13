@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class GateScreen extends StatefulWidget {
+  final Player player;
+
+  GateScreen({required this.player});
+
+  @override
+  _GateScreenState createState() => _GateScreenState();
+}
+
+class _GateScreenState extends State<GateScreen> {
+  int xpReward = 100;
+  bool bossDefeated = false;
+
+  void defeatMonster() {
+    setState(() {
+      widget.player.level += 1;
+      widget.player.statPoints += 1;
+      bossDefeated = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text('Gate Challenge', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red[900],
+      ),
+      body: Center(
+        child: bossDefeated
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('You defeated the boss!',
+                      style: TextStyle(color: Colors.greenAccent, fontSize: 24)),
+                  SizedBox(height: 10),
+                  Text('+1 Level! +1 Stat Point!',
+                      style: TextStyle(color: Colors.white)),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Gate Opened!', style: TextStyle(color: Colors.white, fontSize: 26)),
+                  SizedBox(height: 10),
+                  Text('Do 20 push-ups to defeat the monster!',
+                      style: TextStyle(color: Colors.white70)),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: defeatMonster,
+                    child: Text('I defeated the monster!'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[700],
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
