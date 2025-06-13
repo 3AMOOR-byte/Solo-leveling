@@ -1,0 +1,127 @@
+import 'package:flutter/material.dart';
+
+class Boss {
+  final String name;
+  final String imagePath;
+  final int requiredLevel;
+  final int hp;
+
+  Boss({
+    required this.name,
+    required this.imagePath,
+    required this.requiredLevel,
+    required this.hp,
+  });
+}
+
+class BossGatesScreen extends StatelessWidget {
+  final int playerLevel;
+  final int playerStrength;
+
+  BossGatesScreen({required this.playerLevel, required this.playerStrength});
+
+  final List<Boss> bosses = [
+    Boss(
+      name: "Kang Taeshik",
+      imagePath: "assets/bosses/kang_taeshik.png",
+      requiredLevel: 25,
+      hp: 500,
+    ),
+    Boss(
+      name: "Igris",
+      imagePath: "assets/bosses/igris.png",
+      requiredLevel: 30,
+      hp: 1000,
+    ),
+    Boss(
+      name: "Baran",
+      imagePath: "assets/bosses/baran.png",
+      requiredLevel: 40,
+      hp: 1500,
+    ),
+    Boss(
+      name: "Ant King",
+      imagePath: "assets/bosses/ant_king.png",
+      requiredLevel: 50,
+      hp: 2000,
+    ),
+    Boss(
+      name: "Beru",
+      imagePath: "assets/bosses/beru.png",
+      requiredLevel: 60,
+      hp: 3000,
+    ),
+    Boss(
+      name: "Sung Il-Hwan",
+      imagePath: "assets/bosses/sung_ilhwan.png",
+      requiredLevel: 70,
+      hp: 4000,
+    ),
+    Boss(
+      name: "Sovereign of Frost",
+      imagePath: "assets/bosses/frost_king.png",
+      requiredLevel: 80,
+      hp: 5000,
+    ),
+  ];
+
+  void fightBoss(BuildContext context, Boss boss) {
+    int totalDamage = playerStrength * 10;
+    bool win = totalDamage >= boss.hp;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(win ? "Victory!" : "Defeat"),
+        content: Text(
+          win
+              ? "You defeated ${boss.name} and earned XP!"
+              : "You were too weak to defeat ${boss.name}.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK"),
+          )
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Boss Gates")),
+      body: ListView(
+        children: bosses.map((boss) {
+          bool unlocked = playerLevel >= boss.requiredLevel;
+
+          return Card(
+            color: unlocked ? Colors.black : Colors.grey[800],
+            child: ListTile(
+              leading: Image.asset(boss.imagePath, width: 50),
+              title: Text(
+                boss.name,
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                "Level ${boss.requiredLevel} | HP: ${boss.hp}",
+                style: TextStyle(color: Colors.white70),
+              ),
+              trailing: unlocked
+                  ? ElevatedButton(
+                      onPressed: () => fightBoss(context, boss),
+                      child: Text("Fight"),
+                    )
+                  : Text(
+                      "Locked",
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+            ),
+          );
+        }).toList(),
+      ),
+      backgroundColor: Colors.black,
+    );
+  }
+}
