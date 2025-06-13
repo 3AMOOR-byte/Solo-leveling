@@ -1,59 +1,88 @@
 class Player {
   String name;
+  String avatarPath;
   int level;
   int xp;
-  int xpToNextLevel;
-  int statPoints;
+  int points;
 
-  // Stats
   int strength;
   int intelligence;
-  int stamina;
+  int vitality;
   int energy;
   int sense;
 
+  bool shadowExtractionUnlocked;
+  List<String> shadowArmy;
+
   Player({
     required this.name,
+    required this.avatarPath,
     this.level = 1,
     this.xp = 0,
-    this.xpToNextLevel = 100,
-    this.statPoints = 0,
-    this.strength = 0,
-    this.intelligence = 0,
-    this.stamina = 0,
-    this.energy = 0,
-    this.sense = 0,
-  });
+    this.points = 0,
+    this.strength = 5,
+    this.intelligence = 5,
+    this.vitality = 5,
+    this.energy = 5,
+    this.sense = 5,
+    this.shadowExtractionUnlocked = false,
+    List<String>? shadowArmy,
+  }) : shadowArmy = shadowArmy ?? [];
 
   void gainXP(int amount) {
     xp += amount;
-    while (xp >= xpToNextLevel) {
-      xp -= xpToNextLevel;
-      level++;
-      statPoints++;
-      xpToNextLevel = (xpToNextLevel * 1.5).toInt();
+    if (xp >= requiredXPForNextLevel()) {
+      levelUp();
     }
   }
 
-  void assignPoint(String stat) {
-    if (statPoints <= 0) return;
-    switch (stat) {
-      case 'strength':
+  void levelUp() {
+    xp = 0;
+    level += 1;
+    points += 1;
+    if (level == 20) {
+      shadowExtractionUnlocked = true;
+    }
+  }
+
+  int requiredXPForNextLevel() {
+    return 100 + (level - 1) * 50;
+  }
+
+  void addShadow(String shadowName) {
+    if (shadowExtractionUnlocked) {
+      shadowArmy.add(shadowName);
+    }
+  }
+
+  void resetStats() {
+    strength = 5;
+    intelligence = 5;
+    vitality = 5;
+    energy = 5;
+    sense = 5;
+    points = 0;
+  }
+
+  void increaseStat(String statName) {
+    if (points <= 0) return;
+    switch (statName) {
+      case 'Strength':
         strength++;
         break;
-      case 'intelligence':
+      case 'Intelligence':
         intelligence++;
         break;
-      case 'stamina':
-        stamina++;
+      case 'Vitality':
+        vitality++;
         break;
-      case 'energy':
+      case 'Energy':
         energy++;
         break;
-      case 'sense':
+      case 'Sense':
         sense++;
         break;
     }
-    statPoints--;
+    points--;
   }
 }
