@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class MonsterGateScreen extends StatefulWidget {
+  final Player player;
+
+  const MonsterGateScreen({super.key, required this.player});
+
+  @override
+  State<MonsterGateScreen> createState() => _MonsterGateScreenState();
+}
+
+class _MonsterGateScreenState extends State<MonsterGateScreen> {
+  int pushUpCount = 0;
+  bool gateCleared = false;
+
+  void _doPushUp() {
+    setState(() {
+      pushUpCount++;
+      if (pushUpCount >= 10) {
+        gateCleared = true;
+        widget.player.gainXP(100 + (widget.player.level * 20));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Gate: Defeat the Monsters', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple[900],
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: gateCleared
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle, size: 100, color: Colors.greenAccent),
+                  const SizedBox(height: 20),
+                  const Text('Gate Cleared!', style: TextStyle(fontSize: 28, color: Colors.white)),
+                  const SizedBox(height: 10),
+                  Text('+XP Gained! Total: ${widget.player.xp}', style: const TextStyle(color: Colors.white70)),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Do Push-ups to Defeat Monsters!', style: TextStyle(fontSize: 20, color: Colors.white)),
+                  const SizedBox(height: 20),
+                  Text('Push-ups: $pushUpCount', style: const TextStyle(fontSize: 26, color: Colors.deepPurpleAccent)),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _doPushUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    ),
+                    child: const Text('Do Push-up', style: TextStyle(fontSize: 20)),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
