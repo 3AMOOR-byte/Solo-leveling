@@ -2,8 +2,9 @@ class Player {
   String name;
   String avatarPath;
   int level;
-  int xp;
-  int points;
+  int currentXP;
+  int xpToNextLevel;
+  int availablePoints;
 
   int strength;
   int intelligence;
@@ -11,78 +12,85 @@ class Player {
   int energy;
   int sense;
 
-  bool shadowExtractionUnlocked;
-  List<String> shadowArmy;
+  List<String> quests;
+  List<String> completedQuests;
+  List<String> defeatedMonsters;
+  List<String> shadows;
 
   Player({
-    required this.name,
-    required this.avatarPath,
+    this.name = '',
+    this.avatarPath = '',
     this.level = 1,
-    this.xp = 0,
-    this.points = 0,
-    this.strength = 5,
-    this.intelligence = 5,
-    this.vitality = 5,
-    this.energy = 5,
-    this.sense = 5,
-    this.shadowExtractionUnlocked = false,
-    List<String>? shadowArmy,
-  }) : shadowArmy = shadowArmy ?? [];
+    this.currentXP = 0,
+    this.xpToNextLevel = 100,
+    this.availablePoints = 0,
+    this.strength = 0,
+    this.intelligence = 0,
+    this.vitality = 0,
+    this.energy = 0,
+    this.sense = 0,
+    List<String>? quests,
+    List<String>? completedQuests,
+    List<String>? defeatedMonsters,
+    List<String>? shadows,
+  })  : quests = quests ?? [],
+        completedQuests = completedQuests ?? [],
+        defeatedMonsters = defeatedMonsters ?? [],
+        shadows = shadows ?? [];
 
   void gainXP(int amount) {
-    xp += amount;
-    if (xp >= requiredXPForNextLevel()) {
+    currentXP += amount;
+    while (currentXP >= xpToNextLevel) {
       levelUp();
     }
   }
 
   void levelUp() {
-    xp = 0;
+    currentXP -= xpToNextLevel;
     level += 1;
-    points += 1;
-    if (level == 20) {
-      shadowExtractionUnlocked = true;
-    }
+    availablePoints += 1;
+
+    // زيادة XP المطلوبة للمستوى التالي
+    xpToNextLevel += 50;
   }
 
-  int requiredXPForNextLevel() {
-    return 100 + (level - 1) * 50;
-  }
+  void assignPoint(String stat) {
+    if (availablePoints <= 0) return;
 
-  void addShadow(String shadowName) {
-    if (shadowExtractionUnlocked) {
-      shadowArmy.add(shadowName);
-    }
-  }
-
-  void resetStats() {
-    strength = 5;
-    intelligence = 5;
-    vitality = 5;
-    energy = 5;
-    sense = 5;
-    points = 0;
-  }
-
-  void increaseStat(String statName) {
-    if (points <= 0) return;
-    switch (statName) {
+    switch (stat) {
       case 'Strength':
-        strength++;
+        strength += 1;
         break;
       case 'Intelligence':
-        intelligence++;
+        intelligence += 1;
         break;
       case 'Vitality':
-        vitality++;
+        vitality += 1;
         break;
       case 'Energy':
-        energy++;
+        energy += 1;
         break;
       case 'Sense':
-        sense++;
+        sense += 1;
         break;
     }
-    points--;
+    availablePoints -= 1;
+  }
+
+  void completeQuest(String quest) {
+    if (quests.contains(quest) && !completedQuests.contains(quest)) {
+      completedQuests.add(quest);
+      gainXP(50); // أو أي قيمة XP مناسبة
+    }
+  }
+
+  void defeatMonster(String monsterName) {
+    if (!defeatedMonsters.contains(monsterName)) {
+      defeatedMonsters.add(monsterName);
+    }
+  }
+
+  bool canExtractShadows() {
+    return level >= 20;
   }
 }
