@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import '../models/item.dart';
+import '../models/player.dart';
+
+class InventoryScreen extends StatelessWidget {
+  final Function(Item)? onUseItem;
+
+  InventoryScreen({this.onUseItem});
+
+  @override
+  Widget build(BuildContext context) {
+    final inventory = Player.instance.inventory;
+
+    return Scaffold(
+      appBar: AppBar(title: Text("Inventory")),
+      body: inventory.isEmpty
+          ? Center(child: Text("Inventory is empty"))
+          : ListView.builder(
+              itemCount: inventory.length,
+              itemBuilder: (context, index) {
+                final item = inventory[index];
+                return ListTile(
+                  title: Text(item.name),
+                  subtitle: Text(item.description),
+                  trailing: onUseItem != null
+                      ? ElevatedButton(
+                          child: Text("Use"),
+                          onPressed: () {
+                            onUseItem!(item);
+                            Navigator.pop(context);
+                          },
+                        )
+                      : null,
+                );
+              },
+            ),
+    );
+  }
+}
