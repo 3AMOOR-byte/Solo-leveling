@@ -2,7 +2,7 @@ workflows:
   build-android:
     name: Build Android APK
     environment:
-      sdk: "flutter"
+      sdk: flutter
       flutter: "3.19.6"
     scripts:
       - name: Install dependencies
