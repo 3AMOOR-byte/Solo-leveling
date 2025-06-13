@@ -1,36 +1,76 @@
 import 'package:flutter/material.dart';
-import '../models/item.dart';
 import '../models/player.dart';
+import '../models/item.dart';
 
-class InventoryScreen extends StatelessWidget {
-  final Function(Item)? onUseItem;
+class InventoryScreen extends StatefulWidget {
+  final Player player;
 
-  InventoryScreen({this.onUseItem});
+  const InventoryScreen({Key? key, required this.player}) : super(key: key);
+
+  @override
+  State<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends State<InventoryScreen> {
+  void _useItem(Item item) {
+    setState(() {
+      widget.player.useItem(item);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.name} used!')),
+    );
+  }
+
+  void _removeItem(Item item) {
+    setState(() {
+      widget.player.inventory.remove(item);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.name} removed.')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final inventory = Player.instance.inventory;
+    final inventory = widget.player.inventory;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Inventory")),
+      appBar: AppBar(
+        title: const Text('Inventory'),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.grey[900],
       body: inventory.isEmpty
-          ? Center(child: Text("Inventory is empty"))
+          ? const Center(
+              child: Text('No items in inventory.',
+                  style: TextStyle(color: Colors.white)),
+            )
           : ListView.builder(
               itemCount: inventory.length,
               itemBuilder: (context, index) {
                 final item = inventory[index];
-                return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text(item.description),
-                  trailing: onUseItem != null
-                      ? ElevatedButton(
-                          child: Text("Use"),
-                          onPressed: () {
-                            onUseItem!(item);
-                            Navigator.pop(context);
-                          },
-                        )
-                      : null,
+                return Card(
+                  color: Colors.grey[800],
+                  child: ListTile(
+                    title: Text(item.name, style: TextStyle(color: Colors.white)),
+                    subtitle: Text(item.description, style: TextStyle(color: Colors.white70)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (item.effect != null)
+                          IconButton(
+                            icon: Icon(Icons.play_arrow, color: Colors.greenAccent),
+                            onPressed: () => _useItem(item),
+                          ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.redAccent),
+                          onPressed: () => _removeItem(item),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
