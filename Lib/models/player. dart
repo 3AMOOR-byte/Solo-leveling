@@ -1,0 +1,59 @@
+class Player {
+  String name;
+  int level;
+  int xp;
+  int xpToNextLevel;
+  int statPoints;
+
+  // Stats
+  int strength;
+  int intelligence;
+  int stamina;
+  int energy;
+  int sense;
+
+  Player({
+    required this.name,
+    this.level = 1,
+    this.xp = 0,
+    this.xpToNextLevel = 100,
+    this.statPoints = 0,
+    this.strength = 0,
+    this.intelligence = 0,
+    this.stamina = 0,
+    this.energy = 0,
+    this.sense = 0,
+  });
+
+  void gainXP(int amount) {
+    xp += amount;
+    while (xp >= xpToNextLevel) {
+      xp -= xpToNextLevel;
+      level++;
+      statPoints++;
+      xpToNextLevel = (xpToNextLevel * 1.5).toInt();
+    }
+  }
+
+  void assignPoint(String stat) {
+    if (statPoints <= 0) return;
+    switch (stat) {
+      case 'strength':
+        strength++;
+        break;
+      case 'intelligence':
+        intelligence++;
+        break;
+      case 'stamina':
+        stamina++;
+        break;
+      case 'energy':
+        energy++;
+        break;
+      case 'sense':
+        sense++;
+        break;
+    }
+    statPoints--;
+  }
+}
