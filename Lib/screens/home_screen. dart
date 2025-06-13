@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import '../models/player.dart';
+
+class HomeScreen extends StatefulWidget {
+  final Player player;
+
+  HomeScreen({required this.player});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Welcome to Solo Leveling')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Player: ${widget.player.name}",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
+            Text("Level: ${widget.player.level}", style: TextStyle(fontSize: 20)),
+            Text("XP: ${widget.player.xp}/${widget.player.xpToNextLevel}",
+                style: TextStyle(fontSize: 20)),
+            SizedBox(height: 16),
+            Text("Strength: ${widget.player.strength}", style: TextStyle(fontSize: 20)),
+            Text("Intelligence: ${widget.player.intelligence}", style: TextStyle(fontSize: 20)),
+            Text("Stamina: ${widget.player.stamina}", style: TextStyle(fontSize: 20)),
+            Text("Energy: ${widget.player.energy}", style: TextStyle(fontSize: 20)),
+            Text("Sense: ${widget.player.sense}", style: TextStyle(fontSize: 20)),
+            SizedBox(height: 16),
+            Text("Stat Points: ${widget.player.statPoints}", style: TextStyle(fontSize: 20)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (widget.player.statPoints > 0) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text("Choose a stat to increase"),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.player.assignPoint('strength');
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Text("Strength"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.player.assignPoint('intelligence');
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Text("Intelligence"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.player.assignPoint('stamina');
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Text("Stamina"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.player.assignPoint('energy');
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Text("Energy"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.player.assignPoint('sense');
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Text("Sense"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text("Distribute Stat Points"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
