@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+class Boss {
+  final String name;
+  final int requiredLevel;
+  final int hp;
+  final int rewardXP;
+  final bool canBeShadow;
+
+  Boss({
+    required this.name,
+    required this.requiredLevel,
+    required this.hp,
+    required this.rewardXP,
+    required this.canBeShadow,
+  });
+}
+
+class BossBattleScreen extends StatefulWidget {
+  final int playerLevel;
+  final int playerStrength;
+
+  const BossBattleScreen({
+    Key? key,
+    required this.playerLevel,
+    required this.playerStrength,
+  }) : super(key: key);
+
+  @override
+  _BossBattleScreenState createState() => _BossBattleScreenState();
+}
+
+class _BossBattleScreenState extends State<BossBattleScreen> {
+  List<Boss> bosses = [
+    Boss(name: 'Igris', requiredLevel: 25, hp: 200, rewardXP: 300, canBeShadow: true),
+    Boss(name: 'Kargalgan', requiredLevel: 30, hp: 350, rewardXP: 450, canBeShadow: true),
+    Boss(name: 'Baruka', requiredLevel: 35, hp: 500, rewardXP: 600, canBeShadow: true),
+    Boss(name: 'Iron', requiredLevel: 40, hp: 700, rewardXP: 800, canBeShadow: true),
+    Boss(name: 'Kamish', requiredLevel: 50, hp: 1000, rewardXP: 1200, canBeShadow: true),
+  ];
+
+  Map<String, int> bossHP = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (var boss in bosses) {
+      bossHP[boss.name] = boss.hp;
+    }
+  }
+
+  void fightBoss(Boss boss) {
+    if (widget.playerLevel < boss.requiredLevel) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("مستواك مش كافي لمواجهة ${boss.name}")),
+      );
+      return;
+    }
+
+    setState(() {
+      bossHP[boss.name] = (bossHP[boss.name]! - widget.playerStrength).clamp(0, boss.hp);
+    });
+
+    if (bossHP[boss.name] == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "هزمت ${boss.name}! +${boss.rewardXP} XP" +
+                  (boss.canBeShadow ? " واحتمال استخراج الظل ✅" : "")
+          ),
+        ),
+      );
+
+      // ممكن تضيف هنا كود إضافة XP أو استخراج ظل لو عايز
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Boss Battles")),
+      body: ListView(
+        children: bosses.map((boss) {
+          final currentHP = bossHP[boss.name]!;
+          return Card(
+            margin: const EdgeInsets.all(8),
+            child: ListTile(
+              title: Text("${boss.name} (LVL ${boss.requiredLevel})"),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("HP: $currentHP / ${boss.hp}"),
+                  if (widget.playerLevel < boss.requiredLevel)
+                    Text("🔒 غير متاح حتى LVL ${boss.requiredLevel}",
+                        style: const TextStyle(color: Colors.red)),
+                ],
+              ),
+              trailing: ElevatedButton(
+                onPressed: currentHP > 0 ? () => fightBoss(boss) : null,
+                child: const Text("Fight"),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
