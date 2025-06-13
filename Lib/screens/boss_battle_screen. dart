@@ -1,41 +1,39 @@
 import 'package:flutter/material.dart';
 
-class BossBattleScreen extends StatelessWidget { final String bossName; final int bossHp; final int playerStrength; final VoidCallback onVictory;
+class Boss { final String name; int hp; final int requiredLevel;
 
-const BossBattleScreen({ Key? key, required this.bossName, required this.bossHp, required this.playerStrength, required this.onVictory, }) : super(key: key);
+Boss({required this.name, required this.hp, required this.requiredLevel}); }
 
-@override Widget build(BuildContext context) { int currentBossHp = bossHp;
+class BossBattleScreen extends StatefulWidget { final int playerLevel; final int playerStrength;
+
+const BossBattleScreen({super.key, required this.playerLevel, required this.playerStrength});
+
+@override State<BossBattleScreen> createState() => _BossBattleScreenState(); }
+
+class _BossBattleScreenState extends State<BossBattleScreen> { List<Boss> allBosses = [ Boss(name: 'Igris', hp: 500, requiredLevel: 25), Boss(name: 'Baruka', hp: 700, requiredLevel: 30), Boss(name: 'Iron', hp: 1000, requiredLevel: 35), Boss(name: 'Kargalgan', hp: 1500, requiredLevel: 40), Boss(name: 'Blood-Red Commander Igris', hp: 2000, requiredLevel: 45), Boss(name: 'The Demon King', hp: 2500, requiredLevel: 50), Boss(name: 'Kamish', hp: 4000, requiredLevel: 55), Boss(name: 'Ant King', hp: 5000, requiredLevel: 60), Boss(name: 'Beru', hp: 6000, requiredLevel: 65), Boss(name: 'Monarch of Frost', hp: 7000, requiredLevel: 70), Boss(name: 'Monarch of Beastly Fangs', hp: 8000, requiredLevel: 75), Boss(name: 'Monarch of Plagues', hp: 8500, requiredLevel: 80), Boss(name: 'Monarch of Destruction', hp: 10000, requiredLevel: 90), ];
+
+void startBattle(Boss boss) { Navigator.push( context, MaterialPageRoute( builder: (_) => BossFightScreen( boss: boss, playerStrength: widget.playerStrength, ), ), ); }
+
+@override Widget build(BuildContext context) { List<Boss> availableBosses = allBosses.where((boss) => widget.playerLevel >= boss.requiredLevel).toList();
 
 return Scaffold(
-  appBar: AppBar(
-    title: Text('Battle vs $bossName'),
-    backgroundColor: Colors.black,
-  ),
-  backgroundColor: Colors.grey[900],
-  body: StatefulBuilder(
-    builder: (context, setState) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '$bossName HP: $currentBossHp',
-              style: TextStyle(color: Colors.red, fontSize: 22),
-            ),
-            SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  currentBossHp -= playerStrength * 5;
-                  if (currentBossHp <= 0) {
-                    onVictory();
-                    Navigator.pop(context);
-                  }
-                });
-              },
-              child: Text('Attack with Training'),
-            )
-          ],
+  appBar: AppBar(title: const Text('Boss Gates')),
+  body: ListView.builder(
+    itemCount: availableBosses.length,
+    itemBuilder: (context, index) {
+      final boss = availableBosses[index];
+      return Card(
+        child: ListTile(
+          title: Text(boss.name),
+          subtitle: Text('HP: ${boss.hp} | Required Level: ${boss.requiredLevel}'),
+          trailing: ElevatedButton(
+            onPressed: () => startBattle(Boss(
+              name: boss.name,
+              hp: boss.hp,
+              requiredLevel: boss.requiredLevel,
+            )),
+            child: const Text('Fight'),
+          ),
         ),
       );
     },
@@ -43,4 +41,18 @@ return Scaffold(
 );
 
 } }
+
+class BossFightScreen extends StatefulWidget { final Boss boss; final int playerStrength;
+
+const BossFightScreen({super.key, required this.boss, required this.playerStrength});
+
+@override State<BossFightScreen> createState() => _BossFightScreenState(); }
+
+class _BossFightScreenState extends State<BossFightScreen> { late int currentBossHp; bool isVictory = false;
+
+@override void initState() { super.initState(); currentBossHp = widget.boss.hp; }
+
+void attackBoss() { setState(() { currentBossHp -= widget.playerStrength; if (currentBossHp <= 0) { currentBossHp = 0; isVictory = true; } }); }
+
+@override Widget build(BuildContext context) { return Scaffold( appBar: AppBar(title: Text(widget.boss.name)), body: Padding( padding: const EdgeInsets.all(16.0), child: Column( crossAxisAlignment: CrossAxisAlignment.center, children: [ Text( '${widget.boss.name}\nHP: $currentBossHp', style: const TextStyle(fontSize: 24), textAlign: TextAlign.center, ), const SizedBox(height: 20), if (!isVictory) ElevatedButton( onPressed: attackBoss, child: const Text('Do Push-up to Attack'), ) else Column( children: [ const Text( 'Victory! You defeated the boss.', style: TextStyle(fontSize: 20, color: Colors.green), ), ElevatedButton( onPressed: () => Navigator.pop(context), child: const Text('Return'), ) ], ) ], ), ), ); } }
 
